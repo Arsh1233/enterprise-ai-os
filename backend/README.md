@@ -1,56 +1,30 @@
 # Enterprise AI Operating System (EAIOS) - Backend Foundation
 
-This directory contains the FastAPI-based backend foundation for the EAIOS platform, prepared for subsequent AI, database, and infrastructure integration (Story 1.3).
+This directory contains the FastAPI-based backend foundation for the EAIOS platform.
 
 ## Architecture
 
-The backend follows a flat `app/` architecture to avoid unnecessary depth while grouping concerns logically:
+The backend follows a flat `app/` architecture:
 - **`app/api/`**: The FastAPI routers and endpoints for the API, organized by version.
 - **`app/core/`**: Application factory, lifespan, and foundational bootstrapping.
 - **`app/config/`**: Pydantic `BaseSettings` configurations loading from environment variables.
 - **`app/logging/`**: Structured JSON logging setup via `structlog`.
-- **`app/middleware/`**: Cross-cutting HTTP middlewares (Logging, Process time, CORS, Request ID, etc.).
-- **`app/exceptions/`**: Centralized HTTP and Validation exception handling returning consistent `ORJSON` responses.
+- **`app/middleware/`**: Cross-cutting HTTP middlewares.
+- **`app/exceptions/`**: Centralized HTTP and Validation exception handling.
 
-## Folder Structure
+## Developer Setup
 
-```text
-backend/
-├── app/
-│   ├── api/
-│   │   └── v1/
-│   │       ├── health.py
-│   │       ├── root.py
-│   │       ├── version.py
-│   │       └── router.py
-│   ├── core/
-│   ├── config/
-│   ├── logging/
-│   ├── middleware/
-│   ├── exceptions/
-│   ├── dependencies/
-│   ├── schemas/
-│   ├── services/
-│   └── utils/
-├── tests/
-├── scripts/
-├── main.py              # Application entrypoint
-├── Makefile
-├── pyproject.toml       # uv / PEP 621 Config
-└── Dockerfile
-```
-
-## Setup
-
-This project uses [uv](https://github.com/astral-sh/uv) for lightning-fast dependency management instead of Poetry.
-
-1. Install `uv`.
+1. Install [uv](https://github.com/astral-sh/uv).
 2. Clone the repository and navigate to the `backend/` directory.
 3. Install dependencies:
 ```bash
 make install
 # or
 uv pip install -e ".[dev]"
+```
+4. Install `pre-commit` hooks:
+```bash
+pre-commit install
 ```
 
 ## Running
@@ -59,41 +33,42 @@ To start the local Uvicorn development server:
 ```bash
 make run
 # or
-uvicorn main:app --reload
-```
-The server will run on `http://localhost:8000`. 
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
-
-## Testing
-
-Tests are written using `pytest`.
-```bash
-make test
+uvicorn app.main:app --reload
 ```
 
-## Formatting & Code Quality
+## Quality Commands
 
-This project enforces code quality through `black` (formatting), `ruff` (linting), and `mypy` (static type checking). 
+We maintain strict code quality standards enforced via Makefile targets:
 
-To run linters:
-```bash
-make lint
-```
+- `make lint` - Runs Ruff to check for linting errors.
+- `make format` - Runs Ruff to format the code automatically.
+- `make typecheck` - Runs MyPy for static type checking.
+- `make test` - Runs the test suite using Pytest.
+- `make coverage` - Runs tests and generates a coverage report.
+- `make ci` - Runs the full suite of checks performed in CI.
 
-To format code:
-```bash
-make format
-```
+## CI
 
-To run type checks:
-```bash
-make typecheck
-```
+We use GitHub Actions for Continuous Integration. The CI pipeline runs on every `push` and `pull_request` to the `main` branch. It ensures that:
+- Dependencies are successfully installed via `uv`.
+- The code passes `ruff check` and `ruff format --check`.
+- Static typing passes via `mypy`.
+- The test suite passes and meets the coverage requirement.
 
-## Development Workflow
+## Coverage
 
-1. Configure `.env` in `backend/` by copying standard properties.
-2. Ensure you have `pre-commit` hooks installed for continuous validation (`pre-commit install`).
-3. Maintain type hints across all contributions.
-4. No wildcard imports, global state, or duplicated code.
+Test coverage is enforced using `pytest-cov`.
+- Target coverage: **80%+**
+- Run locally with: `make coverage`
+- Generates `coverage.xml` and terminal reports.
+- Ignores `tests/` and `migrations/`.
+
+## Contribution Workflow
+
+1. Create a new branch for your feature or bugfix.
+2. Make your changes in the `app/` directory.
+3. Ensure you have run `make format` and `make lint`.
+4. Verify your changes don't break typing by running `make typecheck`.
+5. Write tests and ensure coverage remains above 80% with `make coverage`.
+6. Commit your changes (pre-commit hooks will automatically run).
+7. Submit a Pull Request and ensure the GitHub Actions CI pipeline passes.

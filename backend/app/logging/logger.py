@@ -1,11 +1,14 @@
 import logging
 import sys
+
 import structlog
+
 from app.config.settings import settings
+
 
 def setup_logging() -> None:
     log_level = getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO)
-    
+
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
@@ -26,12 +29,15 @@ def setup_logging() -> None:
         processors.append(structlog.dev.ConsoleRenderer())
 
     structlog.configure(
-        processors=processors, # type: ignore
+        processors=processors,  # type: ignore[arg-type]
         context_class=structlog.threadlocal.wrap_dict(dict),
         logger_factory=structlog.stdlib.LoggerFactory(),
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
 
+
 def get_logger(name: str) -> structlog.stdlib.BoundLogger:
-    return structlog.get_logger(name)
+    import typing
+
+    return typing.cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))

@@ -1,35 +1,39 @@
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
 from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.exceptions import RequestValidationError
+from fastapi.responses import ORJSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.v1.root import router as root_router
+from app.api.v1.router import api_router
 from app.config.settings import settings
-from app.logging.logger import setup_logging, get_logger
-from app.middleware.request_id import RequestIDMiddleware
+from app.exceptions.handlers import (
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_exception_handler,
+)
+from app.logging.logger import get_logger, setup_logging
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.middleware.process_time import ProcessTimeMiddleware
-from app.exceptions.handlers import (
-    validation_exception_handler,
-    http_exception_handler,
-    unhandled_exception_handler
-)
-from app.api.v1.router import api_router
-from app.api.v1.root import router as root_router
+from app.middleware.request_id import RequestIDMiddleware
 
 logger = get_logger("lifespan")
 
+
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup logging
     setup_logging()
     logger.info("startup", message="Application starting up", env=settings.ENVIRONMENT)
     yield
     # Shutdown logging
     logger.info("shutdown", message="Application shutting down")
+
 
 def create_app() -> FastAPI:
     # Setup structured logging early in case of startup errors
@@ -62,9 +66,9 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIDMiddleware)
 
     # Add exception handlers
-    app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    app.add_exception_handler(Exception, unhandled_exception_handler) # type: ignore
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
+    app.add_exception_handler(StarletteHTTPException, http_exception_handler)  # type: ignore[arg-type]
+    app.add_exception_handler(Exception, unhandled_exception_handler)
 
     # Include routers
     app.include_router(root_router)

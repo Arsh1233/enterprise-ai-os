@@ -1,8 +1,11 @@
-from fastapi import APIRouter
 from typing import Any, Dict
+
+from fastapi import APIRouter
+
 from app.config.settings import settings
 
 router = APIRouter()
+
 
 @router.get("/")
 async def root_endpoint() -> Dict[str, Any]:

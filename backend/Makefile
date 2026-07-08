@@ -15,14 +15,23 @@ test: ## Run tests
 	pytest
 
 lint: ## Run static analysis and linting
-	ruff check .
+	uv run ruff check .
 
 format: ## Run code formatters
-	ruff check . --fix
-	black .
+	uv run ruff check --fix .
+	uv run ruff format .
 
 typecheck: ## Run type checking
-	mypy .
+	uv run mypy .
+
+coverage: ## Run tests and generate coverage report
+	uv run pytest --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=80
+
+ci: ## Run all CI checks
+	uv run ruff check .
+	uv run ruff format --check .
+	uv run mypy .
+	uv run pytest --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=80
 
 docker-build: ## Build the Docker image
 	docker build -t eaios-backend:latest .

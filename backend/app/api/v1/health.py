@@ -1,11 +1,14 @@
-from fastapi import APIRouter
-from typing import Any, Dict
-from datetime import datetime, timezone
 import time
+from datetime import datetime, timezone
+from typing import Any, Dict
+
+from fastapi import APIRouter
+
 from app.config.settings import settings
 
 router = APIRouter()
 START_TIME = time.time()
+
 
 @router.get("/health")
 async def health_endpoint() -> Dict[str, Any]:
@@ -16,5 +19,5 @@ async def health_endpoint() -> Dict[str, Any]:
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT,
         "uptime": round(uptime, 2),
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }

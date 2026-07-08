@@ -1,9 +1,12 @@
 import sys
-from fastapi import APIRouter
 from typing import Any, Dict
+
+from fastapi import APIRouter
+
 from app.config.settings import settings
 
 router = APIRouter()
+
 
 @router.get("/version")
 async def version_endpoint() -> Dict[str, Any]:
