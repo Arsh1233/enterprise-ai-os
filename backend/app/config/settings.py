@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
     ALLOWED_ORIGINS: str = "*"
 
+    # Google ADK
+    GOOGLE_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+
     # Database
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432

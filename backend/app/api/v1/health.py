@@ -18,7 +18,7 @@ START_TIME = time.time()
 @router.get("/health")
 async def health_endpoint(
     db: AsyncSession = Depends(get_db),
-    redis_client: redis.Redis = Depends(get_redis),  # type: ignore[type-arg]
+    redis_client: redis.Redis = Depends(get_redis),
 ) -> Dict[str, Any]:
     uptime = time.time() - START_TIME
 

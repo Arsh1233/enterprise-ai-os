@@ -10,7 +10,7 @@ logger = get_logger("redis")
 
 class RedisClient:
     def __init__(self) -> None:
-        self.redis: Optional[redis.Redis] = None  # type: ignore[type-arg]
+        self.redis: Optional[redis.Redis] = None
 
     async def connect(self) -> None:
         self.redis = redis.from_url(
