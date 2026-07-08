@@ -16,6 +16,9 @@ class Settings(BaseSettings):
 
     # Google ADK
     GOOGLE_API_KEY: str = ""
+
+    # LLM Provider
+    GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
     # Database
