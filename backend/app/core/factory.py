@@ -11,7 +11,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1.root import router as root_router
 from app.api.v1.router import api_router
+from app.cache.redis import redis_client
 from app.config.settings import settings
+from app.db.engine import engine
 from app.exceptions.handlers import (
     http_exception_handler,
     unhandled_exception_handler,
@@ -30,9 +32,20 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup logging
     setup_logging()
     logger.info("startup", message="Application starting up", env=settings.ENVIRONMENT)
+
+    # Initialize Redis
+    await redis_client.connect()
+
     yield
+
     # Shutdown logging
     logger.info("shutdown", message="Application shutting down")
+
+    # Close Redis
+    await redis_client.disconnect()
+
+    # Dispose Database engine
+    await engine.dispose()
 
 
 def create_app() -> FastAPI:
